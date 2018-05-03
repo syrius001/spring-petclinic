@@ -3,14 +3,13 @@
 pipeline {
   agent none
   stages {
-    stage('Maven Install') {
-      agent {
-        docker {
-          image 'maven:3.5.3'
-        }
-      }
+    stage('Docker Push') {
+      agent any
       steps {
-        sh 'mvn clean install'
+        withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+          sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+          sh 'docker push 190319039393/spring-petclinic:latest'
+        }
       }
     }
   }
